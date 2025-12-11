@@ -4,8 +4,10 @@ import com.utkarshshaning.journalApp.entity.UserEntry;
 import com.utkarshshaning.journalApp.repository.UserEntryRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,9 +17,16 @@ public class UserEntryService {
     @Autowired
     private UserEntryRepository userEntryRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;  // ✅ Added this
+
     public void saveEntry(UserEntry userEntry){
+        // ✅ Encode password before saving
+        userEntry.setPasssword(passwordEncoder.encode(userEntry.getPasssword()));
+        userEntry.setRoles(Arrays.asList("USER"));
         userEntryRepository.save(userEntry);
     }
+
     public List<UserEntry> getAll(){
         return userEntryRepository.findAll();
     }
@@ -25,11 +34,12 @@ public class UserEntryService {
     public Optional<UserEntry> findbyID(ObjectId id) {
         return userEntryRepository.findById(id);
     }
+
     public void deletebyID(ObjectId id){
         userEntryRepository.deleteById(id);
     }
+
     public UserEntry findByUserName(String username){
         return userEntryRepository.findByUsername(username);
-
     }
 }
